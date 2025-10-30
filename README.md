@@ -1,22 +1,27 @@
 # Learning_CustomOrderNumber
 
-Custom Order Number extension for Magento 2 that allows store owners to customize the order numbering format with flexible configuration options.
+Custom Order Number extension for Magento 2 that allows store owners to customize numbering formats for orders, invoices, shipments, and credit memos with flexible configuration options.
 
 ## Overview
 
-The Custom Order Number extension facilitates store admins to have complete control over the numbering system for orders in their Magento 2 store. Replace Magento's default order numbers with customized formats that align with your business requirements and branding.
+The Custom Order Number extension provides complete control over the numbering system for all sales entities in your Magento 2 store. Replace Magento's default numbering with customized formats that align with your business requirements and branding. Support for orders, invoices, shipments, and credit memos with independent or shared numbering configurations.
 
 ## Features
 
+### Core Features
 - **Custom Order Number Format** - Define your own order number pattern using variables
+- **Custom Invoice Number Format** - Use same as order or configure separate invoice format
+- **Custom Shipment Number Format** - Use same as order or configure separate shipment format
+- **Custom Credit Memo Number Format** - Use same as order or configure separate credit memo format
 - **Store-Specific Counters** - Each store view has independent counter management
 - **Flexible Variables** - Use date and counter variables in your format
 - **Counter Padding** - Add leading zeros for consistent number length
 - **Increment Step** - Customize the increment value for sequential numbering
 - **Date-Based Reset** - Automatically reset counters daily, monthly, or yearly
 - **Format Validation** - Validates format pattern on configuration save
-- **Database Locking** - Prevents duplicate order numbers in high-concurrency scenarios
-- **New Orders Only** - No impact on existing orders
+- **Database Locking** - Prevents duplicate numbers in high-concurrency scenarios
+- **Multiple Entity Support** - Handles multiple invoices/shipments/credit memos per order with unique suffixes
+- **New Entities Only** - No impact on existing orders, invoices, shipments, or credit memos
 
 ## Compatibility
 
@@ -54,45 +59,46 @@ bin/magento setup:static-content:deploy -f
 
 Navigate to: **Stores > Configuration > Learning Modules > Custom Order Number**
 
-### Configuration Options
-
-#### General Settings
+### General Settings
 
 **Enable Module**
 - Enable/Disable the custom order number functionality
 - Scope: Store View
 - Default: No
+- **Note:** This setting controls all entity types (orders, invoices, shipments, credit memos)
 
-#### Order Configuration
+---
 
-**Custom Order Number Format**
+## Order Configuration
+
+### Custom Order Number Format
 - Define the order number pattern using variables
-- Required variable: `{counter}` - must be present in the format
-- Optional variables:
+- **Required variable:** `{counter}` - must be present in the format
+- **Optional variables:**
   - `{yyyy}` - 4-digit year (e.g., 2025)
   - `{yy}` - 2-digit year (e.g., 25)
   - `{mm}` - 2-digit month (e.g., 01)
   - `{dd}` - 2-digit day (e.g., 15)
-- Example: `ORD-{yy}-{mm}-{dd}-{counter}`
-- Result: `ORD-25-01-15-000001`
+- **Example:** `ORD-{yy}-{mm}-{dd}-{counter}`
+- **Result:** `ORD-25-01-15-000001`
 - Scope: Store View
 - Default: `ORD-{yy}-{mm}-{dd}-{counter}`
 
-**Start Counter From**
+### Start Counter From
 - The initial counter value for new orders
 - Use different starting values for different stores (e.g., 1000001 for Store 1, 2000001 for Store 2)
 - Scope: Store View
 - Default: 1
 - Validation: Must be a positive integer
 
-**Counter Increment Step**
+### Counter Increment Step
 - The increment value added to the counter for each new order
 - Example: If last counter is 1000001 and step is 4, next will be 1000005
 - Scope: Store View
 - Default: 1
 - Validation: Must be a positive integer
 
-**Counter Padding**
+### Counter Padding
 - Total number of digits in the counter (with leading zeros)
 - Example: Counter 24 with padding 6 = 000024
 - Set 0 to disable padding
@@ -100,7 +106,7 @@ Navigate to: **Stores > Configuration > Learning Modules > Custom Order Number**
 - Default: 6
 - Validation: Must be zero or greater
 
-**Reset Counter on Date Change**
+### Reset Counter on Date Change
 - Automatically reset counter based on time period
 - Options:
   - **No** - Counter never resets automatically
@@ -111,64 +117,237 @@ Navigate to: **Stores > Configuration > Learning Modules > Custom Order Number**
 - Scope: Store View
 - Default: No
 
+---
+
+## Invoice Configuration
+
+### Same as Order Number
+- **Yes** - Invoice will use the exact same number as the order
+  - Example: Order `ORD-25-10-30-000001` → Invoice `ORD-25-10-30-000001`
+  - **Multiple Invoices:** When creating multiple invoices for the same order, suffixes are automatically added:
+    - First invoice: `ORD-25-10-30-000001`
+    - Second invoice: `ORD-25-10-30-000001-1`
+    - Third invoice: `ORD-25-10-30-000001-2`
+- **No** - Invoice will use its own format and counter configuration
+- Scope: Store View
+- Default: Yes
+
+### Custom Invoice Number Format (when "Same as Order" is No)
+- Define the invoice number pattern using variables
+- **Required variable:** `{counter}` - must be present in the format
+- **Optional variables:** `{yyyy}`, `{yy}`, `{mm}`, `{dd}`
+- **Example:** `INV-{yy}-{mm}-{dd}-{counter}`
+- **Result:** `INV-25-10-30-000001`
+- Scope: Store View
+- Default: `INV-{yy}-{mm}-{dd}-{counter}`
+- **Note:** Only visible when "Same as Order Number" is set to "No"
+
+### Start Counter From (Invoice)
+- The initial counter value for new invoices
+- Only used when "Same as Order Number" is "No"
+- Scope: Store View
+- Default: 1
+- Validation: Must be a positive integer
+
+### Counter Increment Step (Invoice)
+- The increment value for invoice counter
+- Only used when "Same as Order Number" is "No"
+- Scope: Store View
+- Default: 1
+- Validation: Must be a positive integer
+
+### Counter Padding (Invoice)
+- Total number of digits in the invoice counter (with leading zeros)
+- Only used when "Same as Order Number" is "No"
+- Scope: Store View
+- Default: 6
+- Validation: Must be zero or greater
+
+### Reset Counter on Date Change (Invoice)
+- Automatically reset invoice counter based on time period
+- Only used when "Same as Order Number" is "No"
+- Options: No / Daily / Monthly / Yearly
+- Scope: Store View
+- Default: No
+
+---
+
+## Shipment Configuration
+
+### Same as Order Number
+- **Yes** - Shipment will use the exact same number as the order
+  - Example: Order `ORD-25-10-30-000001` → Shipment `ORD-25-10-30-000001`
+  - **Multiple Shipments:** When creating multiple shipments for the same order, suffixes are automatically added:
+    - First shipment: `ORD-25-10-30-000001`
+    - Second shipment: `ORD-25-10-30-000001-1`
+    - Third shipment: `ORD-25-10-30-000001-2`
+- **No** - Shipment will use its own format and counter configuration
+- Scope: Store View
+- Default: Yes
+
+### Custom Shipment Number Format (when "Same as Order" is No)
+- Define the shipment number pattern using variables
+- **Required variable:** `{counter}` - must be present in the format
+- **Optional variables:** `{yyyy}`, `{yy}`, `{mm}`, `{dd}`
+- **Example:** `SHIP-{yy}-{mm}-{dd}-{counter}`
+- **Result:** `SHIP-25-10-30-000001`
+- Scope: Store View
+- Default: `SHIP-{yy}-{mm}-{dd}-{counter}`
+- **Note:** Only visible when "Same as Order Number" is set to "No"
+
+### Start Counter From (Shipment)
+- The initial counter value for new shipments
+- Only used when "Same as Order Number" is "No"
+- Scope: Store View
+- Default: 1
+- Validation: Must be a positive integer
+
+### Counter Increment Step (Shipment)
+- The increment value for shipment counter
+- Only used when "Same as Order Number" is "No"
+- Scope: Store View
+- Default: 1
+- Validation: Must be a positive integer
+
+### Counter Padding (Shipment)
+- Total number of digits in the shipment counter (with leading zeros)
+- Only used when "Same as Order Number" is "No"
+- Scope: Store View
+- Default: 6
+- Validation: Must be zero or greater
+
+### Reset Counter on Date Change (Shipment)
+- Automatically reset shipment counter based on time period
+- Only used when "Same as Order Number" is "No"
+- Options: No / Daily / Monthly / Yearly
+- Scope: Store View
+- Default: No
+
+---
+
+## Credit Memo Configuration
+
+### Same as Order Number
+- **Yes** - Credit memo will use the exact same number as the order
+  - Example: Order `ORD-25-10-30-000001` → Credit Memo `ORD-25-10-30-000001`
+  - **Multiple Credit Memos:** When creating multiple credit memos for the same order, suffixes are automatically added:
+    - First credit memo: `ORD-25-10-30-000001`
+    - Second credit memo: `ORD-25-10-30-000001-1`
+    - Third credit memo: `ORD-25-10-30-000001-2`
+- **No** - Credit memo will use its own format and counter configuration
+- Scope: Store View
+- Default: Yes
+
+### Custom Credit Memo Number Format (when "Same as Order" is No)
+- Define the credit memo number pattern using variables
+- **Required variable:** `{counter}` - must be present in the format
+- **Optional variables:** `{yyyy}`, `{yy}`, `{mm}`, `{dd}`
+- **Example:** `CR-{yy}-{mm}-{dd}-{counter}`
+- **Result:** `CR-25-10-30-000001`
+- Scope: Store View
+- Default: `CR-{yy}-{mm}-{dd}-{counter}`
+- **Note:** Only visible when "Same as Order Number" is set to "No"
+
+### Start Counter From (Credit Memo)
+- The initial counter value for new credit memos
+- Only used when "Same as Order Number" is "No"
+- Scope: Store View
+- Default: 1
+- Validation: Must be a positive integer
+
+### Counter Increment Step (Credit Memo)
+- The increment value for credit memo counter
+- Only used when "Same as Order Number" is "No"
+- Scope: Store View
+- Default: 1
+- Validation: Must be a positive integer
+
+### Counter Padding (Credit Memo)
+- Total number of digits in the credit memo counter (with leading zeros)
+- Only used when "Same as Order Number" is "No"
+- Scope: Store View
+- Default: 6
+- Validation: Must be zero or greater
+
+### Reset Counter on Date Change (Credit Memo)
+- Automatically reset credit memo counter based on time period
+- Only used when "Same as Order Number" is "No"
+- Options: No / Daily / Monthly / Yearly
+- Scope: Store View
+- Default: No
+
+---
+
 ## Usage Examples
 
-### Example 1: Simple Sequential Numbering
+### Example 1: All Entities Same as Order
 
 **Configuration:**
-- Format: `{counter}`
-- Start Counter: 1
-- Increment Step: 1
-- Padding: 6
+- Order Format: `ORD-{yy}-{mm}-{dd}-{counter}`
+- Invoice Same as Order: **Yes**
+- Shipment Same as Order: **Yes**
+- Credit Memo Same as Order: **Yes`
 
-**Result:** `000001`, `000002`, `000003`, ...
+**Results:**
+- Order: `ORD-25-01-15-000001`
+- Invoice: `ORD-25-01-15-000001`
+- Shipment: `ORD-25-01-15-000001`
+- Credit Memo: `ORD-25-01-15-000001`
 
-### Example 2: Date-Based Order Numbers
+### Example 2: All Entities with Own Formats
 
 **Configuration:**
-- Format: `ORD-{yyyy}-{mm}-{dd}-{counter}`
-- Start Counter: 1
-- Increment Step: 1
-- Padding: 4
+- Order Format: `ORD-{yy}-{mm}-{dd}-{counter}`
+- Invoice Same as Order: **No**, Format: `INV-{yy}-{mm}-{dd}-{counter}`
+- Shipment Same as Order: **No**, Format: `SHIP-{yy}-{mm}-{dd}-{counter}`
+- Credit Memo Same as Order: **No**, Format: `CR-{yy}-{mm}-{dd}-{counter}`
 
-**Result:** `ORD-2025-01-15-0001`, `ORD-2025-01-15-0002`, ...
+**Results:**
+- Order: `ORD-25-01-15-000001`
+- Invoice: `INV-25-01-15-000001`
+- Shipment: `SHIP-25-01-15-000001`
+- Credit Memo: `CR-25-01-15-000001`
 
-### Example 3: Store-Specific Numbering
+### Example 3: Multiple Invoices/Shipments/Credit Memos
 
-**Store 1 Configuration:**
-- Format: `ST1-{counter}`
-- Start Counter: 1000001
-- Increment Step: 1
-- Padding: 0
+**Configuration:**
+- Order Format: `ORD-{yy}-{mm}-{dd}-{counter}`
+- Invoice Same as Order: **Yes**
+- Shipment Same as Order: **Yes`
 
-**Store 1 Result:** `ST1-1000001`, `ST1-1000002`, ...
+**Order:** `ORD-25-01-15-000001`
 
-**Store 2 Configuration:**
-- Format: `ST2-{counter}`
-- Start Counter: 2000001
-- Increment Step: 1
-- Padding: 0
+**Multiple Invoices:**
+- First Invoice: `ORD-25-01-15-000001`
+- Second Invoice: `ORD-25-01-15-000001-1`
+- Third Invoice: `ORD-25-01-15-000001-2`
 
-**Store 2 Result:** `ST2-2000001`, `ST2-2000002`, ...
+**Multiple Shipments:**
+- First Shipment: `ORD-25-01-15-000001`
+- Second Shipment: `ORD-25-01-15-000001-1`
+
+**Multiple Credit Memos:**
+- First Credit Memo: `ORD-25-01-15-000001`
+- Second Credit Memo: `ORD-25-01-15-000001-1`
 
 ### Example 4: Daily Reset Counters
 
 **Configuration:**
-- Format: `ORD-{yy}{mm}{dd}-{counter}`
+- Order Format: `ORD-{yy}{mm}{dd}-{counter}`
 - Start Counter: 1
-- Increment Step: 1
-- Padding: 4
 - Reset Counter: Daily
 
 **Results:**
 - Day 1: `ORD-250115-0001`, `ORD-250115-0002`, ...
 - Day 2: `ORD-250116-0001`, `ORD-250116-0002`, ...
 
+---
+
 ## Multi-Store Support
 
 The extension fully supports Magento's multi-store functionality:
 
-- Each store view has **independent counter management**
+- Each store view has **independent counter management** for all entity types
 - Configuration can be set at **Store View scope**
 - Different formats can be used for different stores
 - Separate "Start Counter From" values ensure no conflicts between stores
@@ -177,21 +356,23 @@ The extension fully supports Magento's multi-store functionality:
 
 **Store 1 (US Store):**
 ```
-Format: US-{yyyy}-{counter}
+Order Format: US-ORD-{yyyy}-{counter}
+Invoice: Same as Order
+Shipment: Same as Order
+Credit Memo: Same as Order
 Start Counter: 1000001
 ```
 
 **Store 2 (EU Store):**
 ```
-Format: EU-{yyyy}-{counter}
+Order Format: EU-ORD-{yyyy}-{counter}
+Invoice: Own Format: EU-INV-{yyyy}-{counter}
+Shipment: Same as Order
+Credit Memo: Same as Order
 Start Counter: 2000001
 ```
 
-**Store 3 (Asia Store):**
-```
-Format: ASIA-{yyyy}-{counter}
-Start Counter: 3000001
-```
+---
 
 ## Technical Details
 
@@ -214,27 +395,54 @@ CREATE TABLE learning_custom_order_counter (
 );
 ```
 
+**Entity Types:**
+- `order` - Order counter
+- `invoice` - Invoice counter (when using own format)
+- `shipment` - Shipment counter (when using own format)
+- `creditmemo` - Credit memo counter (when using own format)
+
 ### Architecture
 
-**Plugin System:**
-- Intercepts `Magento\Sales\Model\Order::beforeSave()`
-- Applies custom increment ID only for new orders
-- Uses database row-level locking to prevent duplicate IDs
+**Sequence Manager Override:**
+- Overrides `Magento\SalesSequence\Model\Manager` to provide custom sequence generation
+- Handles order, invoice, shipment, and credit memo entity types
+- Falls back to default Magento sequence for other entity types
+
+**Plugins:**
+- **Invoice Plugin:** `Magento\Sales\Model\ResourceModel\Order\Invoice::beforeSave()`
+  - Sets invoice increment ID same as order when configured
+  - Handles multiple invoices with suffix logic
+- **Shipment Plugin:** `Magento\Sales\Model\ResourceModel\Order\Shipment::beforeSave()`
+  - Sets shipment increment ID same as order when configured
+  - Handles multiple shipments with suffix logic
+- **Credit Memo Plugin:** `Magento\Sales\Model\ResourceModel\Order\Creditmemo::beforeSave()`
+  - Sets credit memo increment ID same as order when configured
+  - Handles multiple credit memos with suffix logic
 
 **Counter Service:**
-- Manages counter retrieval and increment operations
+- Manages counter retrieval and increment operations for all entity types
 - Implements `SELECT ... FOR UPDATE` for atomic operations
 - Handles date-based reset logic
-
-**Cron Job:**
-- Runs daily at midnight (00:00)
-- Checks all counters for reset conditions
-- Resets counters based on configured frequency
+- Supports independent counters for each entity type and store
 
 **Format Validation:**
 - Backend model validates format on config save
 - Ensures `{counter}` variable is present
 - Validates all variables are recognized
+
+### Multiple Entity Handling
+
+When "Same as Order Number" is enabled for invoices, shipments, or credit memos:
+
+1. **First Entity:** Uses order number as-is (e.g., `ORD-25-10-30-000001`)
+2. **Subsequent Entities:** Automatically appends suffix:
+   - Second: `-1` (e.g., `ORD-25-10-30-000001-1`)
+   - Third: `-2` (e.g., `ORD-25-10-30-000001-2`)
+   - And so on...
+
+This prevents unique constraint violations when creating multiple invoices, shipments, or credit memos for the same order.
+
+---
 
 ## Cron Configuration
 
@@ -249,21 +457,25 @@ To manually run the cron:
 bin/magento cron:run
 ```
 
+---
+
 ## Troubleshooting
 
-### Issue: Orders still using default increment ID
+### Issue: Orders/Invoices/Shipments/Credit Memos still using default increment ID
 
 **Solution:**
 1. Ensure the module is enabled: `bin/magento module:status Learning_CustomOrderNumber`
 2. Check configuration: **Stores > Configuration > Learning Modules > Custom Order Number > General Settings > Enable Module** is set to "Yes"
 3. Clear cache: `bin/magento cache:clean`
+4. Recompile DI: `bin/magento setup:di:compile`
 
-### Issue: Duplicate order numbers
+### Issue: Duplicate numbers
 
 **Solution:**
 - The extension uses database locking to prevent duplicates
 - Ensure database transactions are working properly
 - Check logs in `var/log/system.log` for any errors
+- For multiple entities (invoices/shipments/credit memos), ensure "Same as Order Number" is enabled to use suffix logic
 
 ### Issue: Format validation error
 
@@ -280,18 +492,38 @@ bin/magento cron:run
 3. Check cron logs for errors
 4. Ensure module is enabled for the store
 
-### Issue: Different stores have same order numbers
+### Issue: Different stores have same numbers
 
 **Solution:**
 - Configure different "Start Counter From" values for each store
 - Example: Store 1 = 1000001, Store 2 = 2000001
-- Each store maintains independent counters
+- Each store maintains independent counters for each entity type
+
+### Issue: Multiple invoices/shipments/credit memos causing unique constraint violation
+
+**Solution:**
+- Ensure "Same as Order Number" is enabled for the entity type
+- The plugin automatically handles suffix logic for multiple entities
+- Check logs to verify plugin is executing correctly
+
+---
 
 ## Logs
 
 The extension logs important events and errors to:
-- `var/log/system.log` - General information and counter resets
+- `var/log/system.log` - General information, counter resets, and plugin execution
 - `var/log/exception.log` - Critical errors and exceptions
+
+**Log Examples:**
+```
+CustomOrderNumber: Using custom sequence for order
+CustomOrderNumber Sequence: Generated number
+CustomOrderNumber InvoicePlugin: Set invoice increment ID same as order (beforeSave)
+CustomOrderNumber ShipmentPlugin: Set shipment increment ID same as order (beforeSave)
+CustomOrderNumber CreditmemoPlugin: Set credit memo increment ID same as order (beforeSave)
+```
+
+---
 
 ## Uninstallation
 
@@ -318,17 +550,7 @@ bin/magento setup:upgrade
 bin/magento cache:clean
 ```
 
-## Future Enhancements
-
-The following features are planned for future releases:
-
-- Custom formats for **Invoice** numbers
-- Custom formats for **Shipment** numbers
-- Custom formats for **Credit Memo** numbers
-- Admin grid to view and manage counters
-- Manual counter reset functionality from admin
-- Import/Export counter values
-- API endpoints for counter management
+---
 
 ## Support
 
@@ -336,26 +558,20 @@ For issues, questions, or feature requests:
 - Check the troubleshooting section above
 - Review `var/log/system.log` for errors
 - Ensure you're running a compatible Magento version
+- Verify all configuration settings are correct
+
+---
 
 ## License
 
 This extension is provided as-is for educational and commercial use.
 
+---
+
 ## Credits
 
-**Module Name:** Learning_CustomOrderNumber
-**Vendor:** Learning
-**Version:** 1.0.0
-**Magento Version:** 2.4.4 - 2.4.8
+**Module Name:** Learning_CustomOrderNumber  
+**Vendor:** Learning  
+**Version:** 1.0.0  
+**Magento Version:** 2.4.4 - 2.4.8  
 **PHP Version:** 8.1+
-
-## Changelog
-
-### Version 1.0.0
-- Initial release
-- Custom order number formatting
-- Store-specific counters
-- Date-based counter reset
-- Format validation
-- Database locking for concurrency
-- Cron-based counter management
