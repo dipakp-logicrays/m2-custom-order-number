@@ -86,6 +86,24 @@ class CounterService
     }
 
     /**
+     * Get next credit memo number for store
+     *
+     * @param int $storeId
+     * @param string|null $orderIncrementId
+     * @return string
+     * @throws LocalizedException
+     */
+    public function getNextCreditmemoNumber(int $storeId, ?string $orderIncrementId = null): string
+    {
+        // Check if credit memo should use same number as order
+        if ($this->helper->isCreditmemoSameAsOrder($storeId) && $orderIncrementId) {
+            return $orderIncrementId;
+        }
+
+        return $this->getNextNumber(Counter::ENTITY_TYPE_CREDITMEMO, $storeId);
+    }
+
+    /**
      * Get next number for entity type and store
      *
      * @param string $entityType
@@ -129,6 +147,10 @@ class CounterService
                 $format = $this->helper->getShipmentFormat($storeId);
                 $padding = $this->helper->getShipmentPadding($storeId);
                 $incrementStep = $this->helper->getShipmentIncrementStep($storeId);
+            } elseif ($entityType === Counter::ENTITY_TYPE_CREDITMEMO) {
+                $format = $this->helper->getCreditmemoFormat($storeId);
+                $padding = $this->helper->getCreditmemoPadding($storeId);
+                $incrementStep = $this->helper->getCreditmemoIncrementStep($storeId);
             } else {
                 $format = $this->helper->getFormat($storeId);
                 $padding = $this->helper->getPadding($storeId);
@@ -176,6 +198,8 @@ class CounterService
             $startCounter = $this->helper->getInvoiceStartCounter($storeId);
         } elseif ($entityType === Counter::ENTITY_TYPE_SHIPMENT) {
             $startCounter = $this->helper->getShipmentStartCounter($storeId);
+        } elseif ($entityType === Counter::ENTITY_TYPE_CREDITMEMO) {
+            $startCounter = $this->helper->getCreditmemoStartCounter($storeId);
         } else {
             $startCounter = $this->helper->getStartCounter($storeId);
         }
@@ -206,6 +230,8 @@ class CounterService
             $resetFrequency = $this->helper->getInvoiceResetFrequency($storeId);
         } elseif ($entityType === Counter::ENTITY_TYPE_SHIPMENT) {
             $resetFrequency = $this->helper->getShipmentResetFrequency($storeId);
+        } elseif ($entityType === Counter::ENTITY_TYPE_CREDITMEMO) {
+            $resetFrequency = $this->helper->getCreditmemoResetFrequency($storeId);
         } else {
             $resetFrequency = $this->helper->getResetFrequency($storeId);
         }
@@ -248,6 +274,8 @@ class CounterService
                 $startCounter = $this->helper->getInvoiceStartCounter($storeId);
             } elseif ($entityType === Counter::ENTITY_TYPE_SHIPMENT) {
                 $startCounter = $this->helper->getShipmentStartCounter($storeId);
+            } elseif ($entityType === Counter::ENTITY_TYPE_CREDITMEMO) {
+                $startCounter = $this->helper->getCreditmemoStartCounter($storeId);
             } else {
                 $startCounter = $this->helper->getStartCounter($storeId);
             }

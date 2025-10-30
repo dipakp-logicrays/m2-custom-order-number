@@ -37,6 +37,14 @@ class Data extends AbstractHelper
     private const XML_PATH_SHIPMENT_PADDING = 'learning_custom_order_number/shipment/padding';
     private const XML_PATH_SHIPMENT_RESET_COUNTER = 'learning_custom_order_number/shipment/reset_counter';
 
+    // Credit memo paths
+    private const XML_PATH_CREDITMEMO_SAME_AS_ORDER = 'learning_custom_order_number/creditmemo/same_as_order';
+    private const XML_PATH_CREDITMEMO_FORMAT = 'learning_custom_order_number/creditmemo/format';
+    private const XML_PATH_CREDITMEMO_START_COUNTER = 'learning_custom_order_number/creditmemo/start_counter';
+    private const XML_PATH_CREDITMEMO_INCREMENT_STEP = 'learning_custom_order_number/creditmemo/increment_step';
+    private const XML_PATH_CREDITMEMO_PADDING = 'learning_custom_order_number/creditmemo/padding';
+    private const XML_PATH_CREDITMEMO_RESET_COUNTER = 'learning_custom_order_number/creditmemo/reset_counter';
+
     /**
      * Data constructor
      *
@@ -313,6 +321,96 @@ class Data extends AbstractHelper
     {
         return (string) $this->scopeConfig->getValue(
             self::XML_PATH_SHIPMENT_RESET_COUNTER,
+            ScopeInterface::SCOPE_STORE,
+            $storeId
+        );
+    }
+
+    /**
+     * Check if credit memo should use same format as order
+     *
+     * @param int|null $storeId
+     * @return bool
+     */
+    public function isCreditmemoSameAsOrder(?int $storeId = null): bool
+    {
+        return $this->scopeConfig->isSetFlag(
+            self::XML_PATH_CREDITMEMO_SAME_AS_ORDER,
+            ScopeInterface::SCOPE_STORE,
+            $storeId
+        );
+    }
+
+    /**
+     * Get credit memo number format
+     *
+     * @param int|null $storeId
+     * @return string
+     */
+    public function getCreditmemoFormat(?int $storeId = null): string
+    {
+        return (string) $this->scopeConfig->getValue(
+            self::XML_PATH_CREDITMEMO_FORMAT,
+            ScopeInterface::SCOPE_STORE,
+            $storeId
+        );
+    }
+
+    /**
+     * Get credit memo start counter value
+     *
+     * @param int|null $storeId
+     * @return int
+     */
+    public function getCreditmemoStartCounter(?int $storeId = null): int
+    {
+        return (int) $this->scopeConfig->getValue(
+            self::XML_PATH_CREDITMEMO_START_COUNTER,
+            ScopeInterface::SCOPE_STORE,
+            $storeId
+        );
+    }
+
+    /**
+     * Get credit memo increment step
+     *
+     * @param int|null $storeId
+     * @return int
+     */
+    public function getCreditmemoIncrementStep(?int $storeId = null): int
+    {
+        return (int) $this->scopeConfig->getValue(
+            self::XML_PATH_CREDITMEMO_INCREMENT_STEP,
+            ScopeInterface::SCOPE_STORE,
+            $storeId
+        );
+    }
+
+    /**
+     * Get credit memo counter padding
+     *
+     * @param int|null $storeId
+     * @return int
+     */
+    public function getCreditmemoPadding(?int $storeId = null): int
+    {
+        return (int) $this->scopeConfig->getValue(
+            self::XML_PATH_CREDITMEMO_PADDING,
+            ScopeInterface::SCOPE_STORE,
+            $storeId
+        );
+    }
+
+    /**
+     * Get credit memo reset counter frequency
+     *
+     * @param int|null $storeId
+     * @return string
+     */
+    public function getCreditmemoResetFrequency(?int $storeId = null): string
+    {
+        return (string) $this->scopeConfig->getValue(
+            self::XML_PATH_CREDITMEMO_RESET_COUNTER,
             ScopeInterface::SCOPE_STORE,
             $storeId
         );

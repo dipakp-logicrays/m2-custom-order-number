@@ -195,6 +195,69 @@
                     </depends>
                 </field>
             </group>
+
+            <group id="creditmemo" translate="label" type="text" sortOrder="50" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Credit Memo Configuration</label>
+
+                <field id="same_as_order" translate="label comment" type="select" sortOrder="5" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Same as Order Number</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>Select yes to set the credit memo number as order number. If No, use credit memo's own configuration below.</comment>
+                    <depends>
+                        <field id="learning_custom_order_number/general/enabled">1</field>
+                    </depends>
+                </field>
+
+                <field id="format" translate="label comment" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Custom Credit Memo Number Format</label>
+                    <backend_model>Learning\CustomOrderNumber\Model\Config\Backend\ValidateFormat</backend_model>
+                    <comment><![CDATA[Enter the credit memo number format that you want to set (counter variable is must). You can use variables {counter}, {yyyy}, {yy}, {mm}, {dd}. If you type CR-{yy}-{mm}-{dd}-{counter} in the field, you will have credit memo numbers like: CR-13-08-15-000077]]></comment>
+                    <depends>
+                        <field id="learning_custom_order_number/general/enabled">1</field>
+                        <field id="same_as_order">0</field>
+                    </depends>
+                </field>
+
+                <field id="start_counter" translate="label comment" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Start Counter From</label>
+                    <validate>validate-digits validate-greater-than-zero</validate>
+                    <comment>Enter the number to start the counting from.</comment>
+                    <depends>
+                        <field id="learning_custom_order_number/general/enabled">1</field>
+                        <field id="same_as_order">0</field>
+                    </depends>
+                </field>
+
+                <field id="increment_step" translate="label comment" type="text" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Counter Increment Step</label>
+                    <validate>validate-digits validate-greater-than-zero</validate>
+                    <comment>Enter the increment step for the next credit memo number.</comment>
+                    <depends>
+                        <field id="learning_custom_order_number/general/enabled">1</field>
+                        <field id="same_as_order">0</field>
+                    </depends>
+                </field>
+
+                <field id="padding" translate="label comment" type="text" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Counter Padding</label>
+                    <validate>validate-digits validate-zero-or-greater</validate>
+                    <comment>Total digits for the credit memo number, padded with leading zeros.</comment>
+                    <depends>
+                        <field id="learning_custom_order_number/general/enabled">1</field>
+                        <field id="same_as_order">0</field>
+                    </depends>
+                </field>
+
+                <field id="reset_counter" translate="label comment" type="select" sortOrder="50" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Reset Counter on Date Change</label>
+                    <source_model>Learning\CustomOrderNumber\Model\Config\Source\ResetFrequency</source_model>
+                    <comment>Select counter to change on day, month or yearly basis to reset.</comment>
+                    <depends>
+                        <field id="learning_custom_order_number/general/enabled">1</field>
+                        <field id="same_as_order">0</field>
+                    </depends>
+                </field>
+            </group>
         </section>
     </system>
 </config>

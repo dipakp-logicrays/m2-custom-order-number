@@ -18,4 +18,11 @@
                 type="Learning\CustomOrderNumber\Plugin\Sales\Model\Order\ShipmentPlugin"
                 sortOrder="1"/>
     </type>
+
+    <!-- Plugin to set credit memo number same as order when configured -->
+    <type name="Magento\Sales\Model\ResourceModel\Order\Creditmemo">
+        <plugin name="learning_custom_order_number_creditmemo_resource_plugin"
+                type="Learning\CustomOrderNumber\Plugin\Sales\Model\Order\CreditmemoPlugin"
+                sortOrder="1"/>
+    </type>
 </config>

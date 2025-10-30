@@ -61,6 +61,8 @@ class Sequence implements SequenceInterface
                 $number = $this->counterService->getNextInvoiceNumber($this->storeId);
             } elseif ($this->entityType === 'shipment') {
                 $number = $this->counterService->getNextShipmentNumber($this->storeId);
+            } elseif ($this->entityType === 'creditmemo') {
+                $number = $this->counterService->getNextCreditmemoNumber($this->storeId);
             } else {
                 $number = $this->counterService->getNextOrderNumber($this->storeId);
             }
