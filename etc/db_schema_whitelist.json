@@ -1,0 +1,22 @@
+{
+    "learning_custom_order_counter": {
+        "column": {
+            "entity_id": true,
+            "entity_type": true,
+            "store_id": true,
+            "counter_value": true,
+            "last_reset_date": true,
+            "created_at": true,
+            "updated_at": true
+        },
+        "index": {
+            "LEARNING_CUSTOM_ORDER_COUNTER_ENTITY_TYPE": true,
+            "LEARNING_CUSTOM_ORDER_COUNTER_STORE_ID": true
+        },
+        "constraint": {
+            "PRIMARY": true,
+            "LEARNING_CUSTOM_ORDER_COUNTER_ENTITY_TYPE_STORE_ID": true,
+            "LEARNING_CUSTOM_ORDER_COUNTER_STORE_ID_STORE_STORE_ID": true
+        }
+    }
+}

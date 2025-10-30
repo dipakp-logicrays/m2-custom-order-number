@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Store:etc/config.xsd">
+    <default>
+        <learning_custom_order_number>
+            <general>
+                <enabled>0</enabled>
+            </general>
+            <order>
+                <format>ORD-{yy}-{mm}-{dd}-{counter}</format>
+                <start_counter>1</start_counter>
+                <increment_step>1</increment_step>
+                <padding>6</padding>
+                <reset_counter>no</reset_counter>
+            </order>
+        </learning_custom_order_number>
+    </default>
+</config>
