@@ -21,6 +21,14 @@
                 <padding>6</padding>
                 <reset_counter>no</reset_counter>
             </invoice>
+            <shipment>
+                <same_as_order>1</same_as_order>
+                <format>SHIP-{yy}-{mm}-{dd}-{counter}</format>
+                <start_counter>1</start_counter>
+                <increment_step>1</increment_step>
+                <padding>6</padding>
+                <reset_counter>no</reset_counter>
+            </shipment>
         </learning_custom_order_number>
     </default>
 </config>

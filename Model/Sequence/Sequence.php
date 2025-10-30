@@ -59,6 +59,8 @@ class Sequence implements SequenceInterface
             // Generate number based on entity type
             if ($this->entityType === 'invoice') {
                 $number = $this->counterService->getNextInvoiceNumber($this->storeId);
+            } elseif ($this->entityType === 'shipment') {
+                $number = $this->counterService->getNextShipmentNumber($this->storeId);
             } else {
                 $number = $this->counterService->getNextOrderNumber($this->storeId);
             }

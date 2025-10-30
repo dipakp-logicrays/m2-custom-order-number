@@ -68,6 +68,24 @@ class CounterService
     }
 
     /**
+     * Get next shipment number for store
+     *
+     * @param int $storeId
+     * @param string|null $orderIncrementId
+     * @return string
+     * @throws LocalizedException
+     */
+    public function getNextShipmentNumber(int $storeId, ?string $orderIncrementId = null): string
+    {
+        // Check if shipment should use same number as order
+        if ($this->helper->isShipmentSameAsOrder($storeId) && $orderIncrementId) {
+            return $orderIncrementId;
+        }
+
+        return $this->getNextNumber(Counter::ENTITY_TYPE_SHIPMENT, $storeId);
+    }
+
+    /**
      * Get next number for entity type and store
      *
      * @param string $entityType
@@ -107,6 +125,10 @@ class CounterService
                 $format = $this->helper->getInvoiceFormat($storeId);
                 $padding = $this->helper->getInvoicePadding($storeId);
                 $incrementStep = $this->helper->getInvoiceIncrementStep($storeId);
+            } elseif ($entityType === Counter::ENTITY_TYPE_SHIPMENT) {
+                $format = $this->helper->getShipmentFormat($storeId);
+                $padding = $this->helper->getShipmentPadding($storeId);
+                $incrementStep = $this->helper->getShipmentIncrementStep($storeId);
             } else {
                 $format = $this->helper->getFormat($storeId);
                 $padding = $this->helper->getPadding($storeId);
@@ -152,6 +174,8 @@ class CounterService
         // Get start counter based on entity type
         if ($entityType === Counter::ENTITY_TYPE_INVOICE) {
             $startCounter = $this->helper->getInvoiceStartCounter($storeId);
+        } elseif ($entityType === Counter::ENTITY_TYPE_SHIPMENT) {
+            $startCounter = $this->helper->getShipmentStartCounter($storeId);
         } else {
             $startCounter = $this->helper->getStartCounter($storeId);
         }
@@ -180,6 +204,8 @@ class CounterService
         // Get reset frequency based on entity type
         if ($entityType === Counter::ENTITY_TYPE_INVOICE) {
             $resetFrequency = $this->helper->getInvoiceResetFrequency($storeId);
+        } elseif ($entityType === Counter::ENTITY_TYPE_SHIPMENT) {
+            $resetFrequency = $this->helper->getShipmentResetFrequency($storeId);
         } else {
             $resetFrequency = $this->helper->getResetFrequency($storeId);
         }
@@ -220,6 +246,8 @@ class CounterService
             // Get start counter based on entity type
             if ($entityType === Counter::ENTITY_TYPE_INVOICE) {
                 $startCounter = $this->helper->getInvoiceStartCounter($storeId);
+            } elseif ($entityType === Counter::ENTITY_TYPE_SHIPMENT) {
+                $startCounter = $this->helper->getShipmentStartCounter($storeId);
             } else {
                 $startCounter = $this->helper->getStartCounter($storeId);
             }

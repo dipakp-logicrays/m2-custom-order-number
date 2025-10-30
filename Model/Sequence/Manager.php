@@ -88,6 +88,25 @@ class Manager extends \Magento\SalesSequence\Model\Manager
             );
         }
 
+        // Handle shipment entity type with custom sequence
+        if ($entityType === Counter::ENTITY_TYPE_SHIPMENT) {
+            $this->logger->info(
+                'CustomOrderNumber: Using custom sequence for shipment',
+                [
+                    'entity_type' => $entityType,
+                    'store_id' => $storeId,
+                    'same_as_order' => $this->helper->isShipmentSameAsOrder($storeId),
+                ]
+            );
+
+            return new Sequence(
+                $this->counterService,
+                Counter::ENTITY_TYPE_SHIPMENT,
+                $storeId,
+                $this->logger
+            );
+        }
+
         // Use default Magento sequence for other entity types
         $this->logger->debug(
             'CustomOrderNumber: Using default Magento sequence',
