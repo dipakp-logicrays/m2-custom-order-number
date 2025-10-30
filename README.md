@@ -71,6 +71,8 @@ Navigate to: **Stores > Configuration > Learning Modules > Custom Order Number**
 
 ## Order Configuration
 
+![Order Configuration](media/order-configuration.png)
+
 ### Custom Order Number Format
 - Define the order number pattern using variables
 - **Required variable:** `{counter}` - must be present in the format
@@ -120,6 +122,8 @@ Navigate to: **Stores > Configuration > Learning Modules > Custom Order Number**
 ---
 
 ## Invoice Configuration
+
+![Invoice Configuration](media/invoice-configuration.png)
 
 ### Same as Order Number
 - **Yes** - Invoice will use the exact same number as the order
@@ -174,6 +178,8 @@ Navigate to: **Stores > Configuration > Learning Modules > Custom Order Number**
 
 ## Shipment Configuration
 
+![Shipment Configuration](media/shipment-configuration.png)
+
 ### Same as Order Number
 - **Yes** - Shipment will use the exact same number as the order
   - Example: Order `ORD-25-10-30-000001` → Shipment `ORD-25-10-30-000001`
@@ -226,6 +232,8 @@ Navigate to: **Stores > Configuration > Learning Modules > Custom Order Number**
 ---
 
 ## Credit Memo Configuration
+
+![Credit Memo Configuration](media/creditmemo-configuration.png)
 
 ### Same as Order Number
 - **Yes** - Credit memo will use the exact same number as the order
