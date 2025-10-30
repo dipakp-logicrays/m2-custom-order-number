@@ -74,6 +74,9 @@ Navigate to: **Stores > Configuration > Learning Modules > Custom Order Number**
 ![Order Configuration](media/order-configuration.png)
 
 ### Custom Order Number Format
+
+![Custom Order Number Format](media/custom-order-number-format.png)
+
 - Define the order number pattern using variables
 - **Required variable:** `{counter}` - must be present in the format
 - **Optional variables:**
@@ -137,6 +140,9 @@ Navigate to: **Stores > Configuration > Learning Modules > Custom Order Number**
 - Default: Yes
 
 ### Custom Invoice Number Format (when "Same as Order" is No)
+
+![Custom Invoice Number Format](media/custom-invoice-number-format.png)
+
 - Define the invoice number pattern using variables
 - **Required variable:** `{counter}` - must be present in the format
 - **Optional variables:** `{yyyy}`, `{yy}`, `{mm}`, `{dd}`
@@ -192,6 +198,9 @@ Navigate to: **Stores > Configuration > Learning Modules > Custom Order Number**
 - Default: Yes
 
 ### Custom Shipment Number Format (when "Same as Order" is No)
+
+![Custom Shipment Number Format](media/custom-shipment-number-format.png)
+
 - Define the shipment number pattern using variables
 - **Required variable:** `{counter}` - must be present in the format
 - **Optional variables:** `{yyyy}`, `{yy}`, `{mm}`, `{dd}`
@@ -247,6 +256,9 @@ Navigate to: **Stores > Configuration > Learning Modules > Custom Order Number**
 - Default: Yes
 
 ### Custom Credit Memo Number Format (when "Same as Order" is No)
+
+![Custom Credit Memo Number Format](media/custom-creditmemo-number-format.png)
+
 - Define the credit memo number pattern using variables
 - **Required variable:** `{counter}` - must be present in the format
 - **Optional variables:** `{yyyy}`, `{yy}`, `{mm}`, `{dd}`
