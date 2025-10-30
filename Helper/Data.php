@@ -13,11 +13,21 @@ use Magento\Store\Model\ScopeInterface;
 class Data extends AbstractHelper
 {
     private const XML_PATH_ENABLED = 'learning_custom_order_number/general/enabled';
-    private const XML_PATH_FORMAT = 'learning_custom_order_number/order/format';
-    private const XML_PATH_START_COUNTER = 'learning_custom_order_number/order/start_counter';
-    private const XML_PATH_INCREMENT_STEP = 'learning_custom_order_number/order/increment_step';
-    private const XML_PATH_PADDING = 'learning_custom_order_number/order/padding';
-    private const XML_PATH_RESET_COUNTER = 'learning_custom_order_number/order/reset_counter';
+
+    // Order paths
+    private const XML_PATH_ORDER_FORMAT = 'learning_custom_order_number/order/format';
+    private const XML_PATH_ORDER_START_COUNTER = 'learning_custom_order_number/order/start_counter';
+    private const XML_PATH_ORDER_INCREMENT_STEP = 'learning_custom_order_number/order/increment_step';
+    private const XML_PATH_ORDER_PADDING = 'learning_custom_order_number/order/padding';
+    private const XML_PATH_ORDER_RESET_COUNTER = 'learning_custom_order_number/order/reset_counter';
+
+    // Invoice paths
+    private const XML_PATH_INVOICE_SAME_AS_ORDER = 'learning_custom_order_number/invoice/same_as_order';
+    private const XML_PATH_INVOICE_FORMAT = 'learning_custom_order_number/invoice/format';
+    private const XML_PATH_INVOICE_START_COUNTER = 'learning_custom_order_number/invoice/start_counter';
+    private const XML_PATH_INVOICE_INCREMENT_STEP = 'learning_custom_order_number/invoice/increment_step';
+    private const XML_PATH_INVOICE_PADDING = 'learning_custom_order_number/invoice/padding';
+    private const XML_PATH_INVOICE_RESET_COUNTER = 'learning_custom_order_number/invoice/reset_counter';
 
     /**
      * Data constructor
@@ -54,7 +64,7 @@ class Data extends AbstractHelper
     public function getFormat(?int $storeId = null): string
     {
         return (string) $this->scopeConfig->getValue(
-            self::XML_PATH_FORMAT,
+            self::XML_PATH_ORDER_FORMAT,
             ScopeInterface::SCOPE_STORE,
             $storeId
         );
@@ -69,7 +79,7 @@ class Data extends AbstractHelper
     public function getStartCounter(?int $storeId = null): int
     {
         return (int) $this->scopeConfig->getValue(
-            self::XML_PATH_START_COUNTER,
+            self::XML_PATH_ORDER_START_COUNTER,
             ScopeInterface::SCOPE_STORE,
             $storeId
         );
@@ -84,7 +94,7 @@ class Data extends AbstractHelper
     public function getIncrementStep(?int $storeId = null): int
     {
         return (int) $this->scopeConfig->getValue(
-            self::XML_PATH_INCREMENT_STEP,
+            self::XML_PATH_ORDER_INCREMENT_STEP,
             ScopeInterface::SCOPE_STORE,
             $storeId
         );
@@ -99,7 +109,7 @@ class Data extends AbstractHelper
     public function getPadding(?int $storeId = null): int
     {
         return (int) $this->scopeConfig->getValue(
-            self::XML_PATH_PADDING,
+            self::XML_PATH_ORDER_PADDING,
             ScopeInterface::SCOPE_STORE,
             $storeId
         );
@@ -114,7 +124,97 @@ class Data extends AbstractHelper
     public function getResetFrequency(?int $storeId = null): string
     {
         return (string) $this->scopeConfig->getValue(
-            self::XML_PATH_RESET_COUNTER,
+            self::XML_PATH_ORDER_RESET_COUNTER,
+            ScopeInterface::SCOPE_STORE,
+            $storeId
+        );
+    }
+
+    /**
+     * Check if invoice should use same format as order
+     *
+     * @param int|null $storeId
+     * @return bool
+     */
+    public function isInvoiceSameAsOrder(?int $storeId = null): bool
+    {
+        return $this->scopeConfig->isSetFlag(
+            self::XML_PATH_INVOICE_SAME_AS_ORDER,
+            ScopeInterface::SCOPE_STORE,
+            $storeId
+        );
+    }
+
+    /**
+     * Get invoice number format
+     *
+     * @param int|null $storeId
+     * @return string
+     */
+    public function getInvoiceFormat(?int $storeId = null): string
+    {
+        return (string) $this->scopeConfig->getValue(
+            self::XML_PATH_INVOICE_FORMAT,
+            ScopeInterface::SCOPE_STORE,
+            $storeId
+        );
+    }
+
+    /**
+     * Get invoice start counter value
+     *
+     * @param int|null $storeId
+     * @return int
+     */
+    public function getInvoiceStartCounter(?int $storeId = null): int
+    {
+        return (int) $this->scopeConfig->getValue(
+            self::XML_PATH_INVOICE_START_COUNTER,
+            ScopeInterface::SCOPE_STORE,
+            $storeId
+        );
+    }
+
+    /**
+     * Get invoice increment step
+     *
+     * @param int|null $storeId
+     * @return int
+     */
+    public function getInvoiceIncrementStep(?int $storeId = null): int
+    {
+        return (int) $this->scopeConfig->getValue(
+            self::XML_PATH_INVOICE_INCREMENT_STEP,
+            ScopeInterface::SCOPE_STORE,
+            $storeId
+        );
+    }
+
+    /**
+     * Get invoice counter padding
+     *
+     * @param int|null $storeId
+     * @return int
+     */
+    public function getInvoicePadding(?int $storeId = null): int
+    {
+        return (int) $this->scopeConfig->getValue(
+            self::XML_PATH_INVOICE_PADDING,
+            ScopeInterface::SCOPE_STORE,
+            $storeId
+        );
+    }
+
+    /**
+     * Get invoice reset counter frequency
+     *
+     * @param int|null $storeId
+     * @return string
+     */
+    public function getInvoiceResetFrequency(?int $storeId = null): string
+    {
+        return (string) $this->scopeConfig->getValue(
+            self::XML_PATH_INVOICE_RESET_COUNTER,
             ScopeInterface::SCOPE_STORE,
             $storeId
         );

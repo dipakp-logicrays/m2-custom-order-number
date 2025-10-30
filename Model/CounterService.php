@@ -46,6 +46,37 @@ class CounterService
      */
     public function getNextOrderNumber(int $storeId): string
     {
+        return $this->getNextNumber(Counter::ENTITY_TYPE_ORDER, $storeId);
+    }
+
+    /**
+     * Get next invoice number for store
+     *
+     * @param int $storeId
+     * @param string|null $orderIncrementId
+     * @return string
+     * @throws LocalizedException
+     */
+    public function getNextInvoiceNumber(int $storeId, ?string $orderIncrementId = null): string
+    {
+        // Check if invoice should use same number as order
+        if ($this->helper->isInvoiceSameAsOrder($storeId) && $orderIncrementId) {
+            return $orderIncrementId;
+        }
+
+        return $this->getNextNumber(Counter::ENTITY_TYPE_INVOICE, $storeId);
+    }
+
+    /**
+     * Get next number for entity type and store
+     *
+     * @param string $entityType
+     * @param int $storeId
+     * @return string
+     * @throws LocalizedException
+     */
+    private function getNextNumber(string $entityType, int $storeId): string
+    {
         $connection = $this->resourceConnection->getConnection();
         $tableName = $this->resourceConnection->getTableName('learning_custom_order_counter');
 
@@ -54,62 +85,79 @@ class CounterService
         try {
             $select = $connection->select()
                 ->from($tableName)
-                ->where('entity_type = ?', Counter::ENTITY_TYPE_ORDER)
+                ->where('entity_type = ?', $entityType)
                 ->where('store_id = ?', $storeId)
                 ->forUpdate(true);
 
             $row = $connection->fetchRow($select);
 
             if (!$row) {
-                $counter = $this->initializeCounter($storeId);
+                $counter = $this->initializeCounter($entityType, $storeId);
             } else {
                 $counter = $this->counterFactory->create();
                 $counter->setData($row);
 
-                $this->checkAndResetCounter($counter, $storeId);
+                $this->checkAndResetCounter($counter, $entityType, $storeId);
             }
 
             $currentCounter = $counter->getCounterValue();
-            $format = $this->helper->getFormat($storeId);
-            $padding = $this->helper->getPadding($storeId);
 
-            $orderNumber = $this->helper->generateOrderNumber($format, $currentCounter, $padding);
+            // Get configuration based on entity type
+            if ($entityType === Counter::ENTITY_TYPE_INVOICE) {
+                $format = $this->helper->getInvoiceFormat($storeId);
+                $padding = $this->helper->getInvoicePadding($storeId);
+                $incrementStep = $this->helper->getInvoiceIncrementStep($storeId);
+            } else {
+                $format = $this->helper->getFormat($storeId);
+                $padding = $this->helper->getPadding($storeId);
+                $incrementStep = $this->helper->getIncrementStep($storeId);
+            }
 
-            $incrementStep = $this->helper->getIncrementStep($storeId);
+            $number = $this->helper->generateOrderNumber($format, $currentCounter, $padding);
+
             $counter->setCounterValue($currentCounter + $incrementStep);
 
             $this->counterResource->save($counter);
 
             $connection->commit();
 
-            return $orderNumber;
+            return $number;
         } catch (\Exception $e) {
             $connection->rollBack();
 
             $this->logger->error(
-                'Error generating order number: ' . $e->getMessage(),
-                ['exception' => $e]
+                "Error generating {$entityType} number: " . $e->getMessage(),
+                [
+                    'exception' => $e,
+                    'entity_type' => $entityType,
+                ]
             );
 
             throw new LocalizedException(
-                __('Unable to generate order number. Please try again.')
+                __("Unable to generate {$entityType} number. Please try again.")
             );
         }
     }
 
     /**
-     * Initialize counter for new store
+     * Initialize counter for new entity type and store
      *
+     * @param string $entityType
      * @param int $storeId
      * @return Counter
      * @throws LocalizedException
      */
-    private function initializeCounter(int $storeId): Counter
+    private function initializeCounter(string $entityType, int $storeId): Counter
     {
-        $startCounter = $this->helper->getStartCounter($storeId);
+        // Get start counter based on entity type
+        if ($entityType === Counter::ENTITY_TYPE_INVOICE) {
+            $startCounter = $this->helper->getInvoiceStartCounter($storeId);
+        } else {
+            $startCounter = $this->helper->getStartCounter($storeId);
+        }
 
         $counter = $this->counterFactory->create();
-        $counter->setEntityType(Counter::ENTITY_TYPE_ORDER);
+        $counter->setEntityType($entityType);
         $counter->setStoreId($storeId);
         $counter->setCounterValue($startCounter);
         $counter->setLastResetDate(date('Y-m-d'));
@@ -123,12 +171,18 @@ class CounterService
      * Check if counter needs to be reset based on date
      *
      * @param Counter $counter
+     * @param string $entityType
      * @param int $storeId
      * @return void
      */
-    private function checkAndResetCounter(Counter $counter, int $storeId): void
+    private function checkAndResetCounter(Counter $counter, string $entityType, int $storeId): void
     {
-        $resetFrequency = $this->helper->getResetFrequency($storeId);
+        // Get reset frequency based on entity type
+        if ($entityType === Counter::ENTITY_TYPE_INVOICE) {
+            $resetFrequency = $this->helper->getInvoiceResetFrequency($storeId);
+        } else {
+            $resetFrequency = $this->helper->getResetFrequency($storeId);
+        }
 
         if ($resetFrequency === ResetFrequency::RESET_NO) {
             return;
@@ -163,7 +217,13 @@ class CounterService
         }
 
         if ($shouldReset) {
-            $startCounter = $this->helper->getStartCounter($storeId);
+            // Get start counter based on entity type
+            if ($entityType === Counter::ENTITY_TYPE_INVOICE) {
+                $startCounter = $this->helper->getInvoiceStartCounter($storeId);
+            } else {
+                $startCounter = $this->helper->getStartCounter($storeId);
+            }
+
             $counter->setCounterValue($startCounter);
             $counter->setLastResetDate($currentDate);
         }

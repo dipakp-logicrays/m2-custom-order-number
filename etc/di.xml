@@ -4,4 +4,11 @@
     <!-- Override the sequence manager to provide custom order numbers -->
     <preference for="Magento\SalesSequence\Model\Manager"
                 type="Learning\CustomOrderNumber\Model\Sequence\Manager"/>
+
+    <!-- Plugin to set invoice number same as order when configured -->
+    <type name="Magento\Sales\Model\ResourceModel\Order\Invoice">
+        <plugin name="learning_custom_order_number_invoice_resource_plugin"
+                type="Learning\CustomOrderNumber\Plugin\Sales\Model\Order\InvoicePlugin"
+                sortOrder="1"/>
+    </type>
 </config>

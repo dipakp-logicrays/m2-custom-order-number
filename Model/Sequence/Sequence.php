@@ -16,11 +16,13 @@ class Sequence implements SequenceInterface
      * Sequence constructor
      *
      * @param CounterService $counterService
+     * @param string $entityType
      * @param int $storeId
      * @param LoggerInterface $logger
      */
     public function __construct(
         private readonly CounterService $counterService,
+        private readonly string $entityType,
         private readonly int $storeId,
         private readonly LoggerInterface $logger,
     ) {
@@ -45,24 +47,37 @@ class Sequence implements SequenceInterface
      */
     public function getNextValue(): string
     {
-        $this->logger->info('CustomOrderNumber Sequence: getNextValue() called', ['store_id' => $this->storeId]);
+        $this->logger->info(
+            'CustomOrderNumber Sequence: getNextValue() called',
+            [
+                'entity_type' => $this->entityType,
+                'store_id' => $this->storeId,
+            ]
+        );
 
         try {
-            $orderNumber = $this->counterService->getNextOrderNumber($this->storeId);
+            // Generate number based on entity type
+            if ($this->entityType === 'invoice') {
+                $number = $this->counterService->getNextInvoiceNumber($this->storeId);
+            } else {
+                $number = $this->counterService->getNextOrderNumber($this->storeId);
+            }
 
             $this->logger->info(
-                'CustomOrderNumber Sequence: Generated order number',
+                'CustomOrderNumber Sequence: Generated number',
                 [
-                    'order_number' => $orderNumber,
+                    'entity_type' => $this->entityType,
+                    'number' => $number,
                     'store_id' => $this->storeId,
                 ]
             );
 
-            return $orderNumber;
+            return $number;
         } catch (\Exception $e) {
             $this->logger->error(
-                'CustomOrderNumber Sequence: Failed to generate order number',
+                'CustomOrderNumber Sequence: Failed to generate number',
                 [
+                    'entity_type' => $this->entityType,
                     'exception' => $e->getMessage(),
                     'store_id' => $this->storeId,
                     'trace' => $e->getTraceAsString(),

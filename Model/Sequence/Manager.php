@@ -47,8 +47,12 @@ class Manager extends \Magento\SalesSequence\Model\Manager
         // Cast storeId to int to ensure type safety
         $storeId = (int) $storeId;
 
-        // Only handle order entity type with custom sequence
-        if ($entityType === Counter::ENTITY_TYPE_ORDER && $this->helper->isEnabled($storeId)) {
+        if (!$this->helper->isEnabled($storeId)) {
+            return parent::getSequence($entityType, $storeId);
+        }
+
+        // Handle order entity type with custom sequence
+        if ($entityType === Counter::ENTITY_TYPE_ORDER) {
             $this->logger->info(
                 'CustomOrderNumber: Using custom sequence for order',
                 [
@@ -57,16 +61,39 @@ class Manager extends \Magento\SalesSequence\Model\Manager
                 ]
             );
 
-            return new Sequence($this->counterService, $storeId, $this->logger);
+            return new Sequence(
+                $this->counterService,
+                Counter::ENTITY_TYPE_ORDER,
+                $storeId,
+                $this->logger
+            );
         }
 
-        // Use default Magento sequence for other entity types or when disabled
+        // Handle invoice entity type with custom sequence
+        if ($entityType === Counter::ENTITY_TYPE_INVOICE) {
+            $this->logger->info(
+                'CustomOrderNumber: Using custom sequence for invoice',
+                [
+                    'entity_type' => $entityType,
+                    'store_id' => $storeId,
+                    'same_as_order' => $this->helper->isInvoiceSameAsOrder($storeId),
+                ]
+            );
+
+            return new Sequence(
+                $this->counterService,
+                Counter::ENTITY_TYPE_INVOICE,
+                $storeId,
+                $this->logger
+            );
+        }
+
+        // Use default Magento sequence for other entity types
         $this->logger->debug(
             'CustomOrderNumber: Using default Magento sequence',
             [
                 'entity_type' => $entityType,
                 'store_id' => $storeId,
-                'is_enabled' => $this->helper->isEnabled($storeId),
             ]
         );
 
