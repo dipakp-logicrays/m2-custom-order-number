@@ -40,24 +40,32 @@ class ResetCounter
     {
         try {
             $collection = $this->collectionFactory->create();
-            $collection->addFieldToFilter('entity_type', Counter::ENTITY_TYPE_ORDER);
 
+            // Process all entity types: order, invoice, shipment, creditmemo
             foreach ($collection as $counter) {
                 $storeId = $counter->getStoreId();
-                $resetFrequency = $this->helper->getResetFrequency($storeId);
+                $entityType = $counter->getEntityType();
+
+                if (!$this->helper->isEnabled($storeId)) {
+                    continue;
+                }
+
+                // Get reset frequency based on entity type
+                $resetFrequency = $this->getResetFrequencyForEntity($entityType, $storeId);
 
                 if ($resetFrequency === ResetFrequency::RESET_NO) {
                     continue;
                 }
 
-                if (!$this->helper->isEnabled($storeId)) {
+                // Skip entities that use "Same as Order Number" (they don't have their own counter)
+                if ($this->shouldSkipEntity($entityType, $storeId)) {
                     continue;
                 }
 
                 $shouldReset = $this->shouldResetCounter($counter, $resetFrequency);
 
                 if ($shouldReset) {
-                    $this->resetCounterValue($counter, $storeId);
+                    $this->resetCounterValue($counter, $entityType, $storeId);
                 }
             }
         } catch (\Exception $e) {
@@ -105,16 +113,68 @@ class ResetCounter
     }
 
     /**
+     * Get reset frequency for entity type
+     *
+     * @param string $entityType
+     * @param int $storeId
+     * @return string
+     */
+    private function getResetFrequencyForEntity(string $entityType, int $storeId): string
+    {
+        switch ($entityType) {
+            case Counter::ENTITY_TYPE_INVOICE:
+                return $this->helper->getInvoiceResetFrequency($storeId);
+
+            case Counter::ENTITY_TYPE_SHIPMENT:
+                return $this->helper->getShipmentResetFrequency($storeId);
+
+            case Counter::ENTITY_TYPE_CREDITMEMO:
+                return $this->helper->getCreditmemoResetFrequency($storeId);
+
+            case Counter::ENTITY_TYPE_ORDER:
+            default:
+                return $this->helper->getResetFrequency($storeId);
+        }
+    }
+
+    /**
+     * Check if entity should be skipped (when using "Same as Order Number")
+     *
+     * @param string $entityType
+     * @param int $storeId
+     * @return bool
+     */
+    private function shouldSkipEntity(string $entityType, int $storeId): bool
+    {
+        switch ($entityType) {
+            case Counter::ENTITY_TYPE_INVOICE:
+                return $this->helper->isInvoiceSameAsOrder($storeId);
+
+            case Counter::ENTITY_TYPE_SHIPMENT:
+                return $this->helper->isShipmentSameAsOrder($storeId);
+
+            case Counter::ENTITY_TYPE_CREDITMEMO:
+                return $this->helper->isCreditmemoSameAsOrder($storeId);
+
+            default:
+                return false;
+        }
+    }
+
+    /**
      * Reset counter value to start counter
      *
      * @param Counter $counter
+     * @param string $entityType
      * @param int $storeId
      * @return void
      */
-    private function resetCounterValue(Counter $counter, int $storeId): void
+    private function resetCounterValue(Counter $counter, string $entityType, int $storeId): void
     {
         try {
-            $startCounter = $this->helper->getStartCounter($storeId);
+            // Get start counter based on entity type
+            $startCounter = $this->getStartCounterForEntity($entityType, $storeId);
+
             $counter->setCounterValue($startCounter);
             $counter->setLastResetDate(date('Y-m-d'));
 
@@ -122,20 +182,47 @@ class ResetCounter
 
             $this->logger->info(
                 sprintf(
-                    'Counter reset for store %d, entity type: %s',
+                    'Counter reset for store %d, entity type: %s, new counter: %d',
                     $storeId,
-                    $counter->getEntityType()
+                    $entityType,
+                    $startCounter
                 )
             );
         } catch (\Exception $e) {
             $this->logger->error(
                 sprintf(
-                    'Failed to reset counter for store %d: %s',
+                    'Failed to reset counter for store %d, entity type %s: %s',
                     $storeId,
+                    $entityType,
                     $e->getMessage()
                 ),
                 ['exception' => $e]
             );
+        }
+    }
+
+    /**
+     * Get start counter for entity type
+     *
+     * @param string $entityType
+     * @param int $storeId
+     * @return int
+     */
+    private function getStartCounterForEntity(string $entityType, int $storeId): int
+    {
+        switch ($entityType) {
+            case Counter::ENTITY_TYPE_INVOICE:
+                return $this->helper->getInvoiceStartCounter($storeId);
+
+            case Counter::ENTITY_TYPE_SHIPMENT:
+                return $this->helper->getShipmentStartCounter($storeId);
+
+            case Counter::ENTITY_TYPE_CREDITMEMO:
+                return $this->helper->getCreditmemoStartCounter($storeId);
+
+            case Counter::ENTITY_TYPE_ORDER:
+            default:
+                return $this->helper->getStartCounter($storeId);
         }
     }
 }
